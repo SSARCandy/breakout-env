@@ -53,6 +53,14 @@ class Bricks():
     rows = [GameObject([pos[0], pos[1] + p*self.brick_size[1]], self.brick_size, c, r) for p in range(self.cols)]
     return rows
 
+  def outer_boundingbox(self):
+    return [
+      self.bricks_pos[0], 
+      self.bricks_pos[0] + self.brick_size[0]*self.rows, 
+      self.bricks_pos[1], 
+      self.bricks_pos[1] + self.brick_size[1]*self.cols
+    ]
+
 
 def aabb(bb1, bb2):
   if bb1[0] < bb2[0]:
@@ -139,7 +147,7 @@ class Breakout():
     self.started = False
     self.ball = GameObject([100, 10], [5, 2])
     self.ball_v = [-5, -2]
-    self.paddle = GameObject([189, 9], [4, 150])
+    self.paddle = GameObject([189, 9], [4, 15])
     self.paddle_v = [0, 2]
     self.bricks = Bricks(6, 18, [6, 8])
     return self.render()
@@ -169,6 +177,11 @@ class Breakout():
 
   def __bricks_collision(self):
     bb1 = self.ball.boundingbox()
+    outer_bb = self.bricks.outer_boundingbox()
+
+    if not aabb(bb1, outer_bb):
+      return 0
+
     x2 = (bb1[2] + bb1[3]) / 2.0
     # y2 = (bb1[0] + bb1[1]) / 2.0
     x1 = x2 - self.ball_v[1]
@@ -193,17 +206,33 @@ class Breakout():
 
     return 0
 
+def simple_agent(env):
+  if not env.started:
+    return 1
+
+  ball_xs = env.ball.boundingbox()
+  paddle_xs = env.paddle.boundingbox()
+
+  ball_x = ball_xs[2]+ball_xs[3]/2.0
+  paddle_x = paddle_xs[2]+paddle_xs[3]/2.0
+
+  if paddle_x < ball_x:
+    return 2
+  else:
+    return 3
+
 
 if __name__ == '__main__':
   env = Breakout()
   obs = env.reset()
+  done = False
 
-  # plt.ion()
-  # plt.show()
-  for x in range(50000):
-    obs, reward, done, _ = env.step(1)#random.randint(1, 3))
-    print(x, reward, done)
+  # for x in range(1000):
+  while not done:
+    action = simple_agent(env)
+    obs, reward, done, _ = env.step(action)#random.randint(1, 3))
+    # print(x, reward, done)
     cv2.imshow('tt', obs)
     cv2.waitKey(1)
-    # plt.imshow(obs, cmap='gray')
-    # plt.pause(0.01)
+
+
