@@ -89,14 +89,14 @@ class Breakout():
   def step(self, action):
     if self.terminal:
       raise RuntimeError('Take action after game terminated.')
-    if not 0 < action < self.actions:
+    if not 0 <= action < self.actions:
       raise IndexError('Selected action out of range.')
 
     act = self.actions_meaning[action]
 
-    if act == 'RIGHT':
+    if act == 'RIGHT' and self.paddle.boundingbox()[3] + self.paddle_v[1] < FRAME_X[1]:
       self.paddle.translate(self.paddle_v)
-    if act == 'LEFT':
+    if act == 'LEFT' and self.paddle.boundingbox()[3] - self.paddle_v[1] > FRAME_X[0]:
       self.paddle.translate([-x for x in self.paddle_v])
 
     if self.started:
