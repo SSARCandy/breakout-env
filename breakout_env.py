@@ -3,6 +3,17 @@ import numpy as np
 FRAME_X = [7, 152]
 FRAME_Y = [31, 194]
 
+default_conf = {
+  'max_step': 1000,      # int        | 0 ~ inf
+  'lifes': 5,             # int        | 1 ~ inf
+  'ball_speed': [-5, 2], # [int, int] | -inf ~ inf
+  'ball_color': 143,     # int        | 0 ~ 255
+  'ball_size': [5, 2],
+  'paddle_width': 15,
+  'paddle_color': 143,
+  'paddle_speed': 2
+}
+
 # Collision detection
 def aabb(bb1, bb2):
   if bb1[0] < bb2[0]:
@@ -25,7 +36,12 @@ class GameObject():
   def boundingbox(self):
     # BB = (y1, y2, x1, x2)
     return [self.pos[0], self.pos[0] + self.size[0], self.pos[1], self.pos[1] + self.size[1]]
-    
+
+  def center(self):
+    x = self.pos[1] + self.size[1]/2.0
+    y = self.pos[0] + self.size[0]/2.0
+    return (y, x)
+
 # A warpper of all bricks GameObject
 class Bricks():
   def __init__(self, rows, cols, brick_size):
@@ -55,7 +71,10 @@ class Bricks():
 
 
 class Breakout():
-  def __init__(self):
+  def __init__(self, config):
+    self.conf = default_conf
+    self.conf.update(config)
+    self.step_count = 0
     self.shape = (210, 160)
     self.actions = 4
     self.actions_meaning = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
@@ -63,7 +82,7 @@ class Breakout():
     self.digits = [np.load('./asserts/{}.npy'.format(i)) for i in range(10)]
     self.render_bb = {
       'scores': [[5, 15, 36, 48], [5, 15, 52, 64], [5, 15, 68, 80]],
-      'live': [5, 15, 100, 112],
+      'lifes': [5, 15, 100, 112],
       'level': [5, 15, 128, 140]
     }
   
@@ -93,6 +112,10 @@ class Breakout():
     if self.actions_meaning[action] == 'FIRE':
       self.started = True
     
+    self.step_count += 1
+    if self.step_count >= self.max_step:
+      self.terminal = True
+
     # (obs, reward, done, info)
     return self.render(), self.reward, self.terminal, None
 
@@ -113,9 +136,9 @@ class Breakout():
       ball_bb = self.ball.boundingbox()
       obs[ball_bb[0]:ball_bb[1], ball_bb[2]:ball_bb[3]] = self.ball.color
 
-    # Draw info (score, live)
-    live_bb = self.render_bb['live']
-    obs[live_bb[0]:live_bb[1], live_bb[2]:live_bb[3]] = self.digits[self.live]
+    # Draw info (score, lifes)
+    life_bb = self.render_bb['lifes']
+    obs[life_bb[0]:life_bb[1], life_bb[2]:life_bb[3]] = self.digits[self.lifes]
 
     scores_bb = self.render_bb['scores']
     scores = [(self.score // 10**i) % 10 for i in range(2, -1, -1)]
@@ -127,13 +150,14 @@ class Breakout():
   def reset(self):
     self.score = 0
     self.reward = 0
-    self.live = 5
+    self.lifes = self.conf['lifes']
+    self.max_step = self.conf['max_step']
     self.terminal = False
     self.started = False
-    self.ball = GameObject([100, 10], [5, 2])
-    self.ball_v = [-5, -2]
-    self.paddle = GameObject([189, 9], [4, 15])
-    self.paddle_v = [0, 2]
+    self.ball = GameObject([100, 50], self.conf['ball_size'], self.conf['ball_color'])
+    self.ball_v = self.conf['ball_speed']
+    self.paddle = GameObject([189, 9], [4, self.conf['paddle_width']], self.conf['paddle_color'])
+    self.paddle_v = [0, self.conf['paddle_speed']]
     self.bricks = Bricks(6, 18, [6, 8])
     return self.render()
 
@@ -149,8 +173,8 @@ class Breakout():
       self.ball_v = [-self.ball_v[0], self.ball_v[1]]
       self.ball.translate([2*self.ball_v[0], 0])
     elif aabb(bb1, [FRAME_Y[1], 999, 0, 999]): # Bottom edge
-      self.live -= 1
-      self.terminal = self.started and self.live == 0
+      self.lifes -= 1
+      self.terminal = self.started and self.lifes == 0
       self.ball = GameObject([100, 10], [5, 2])
       self.ball_v = [-2, -2]
 
