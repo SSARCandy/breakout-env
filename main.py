@@ -66,6 +66,13 @@ class Breakout():
     self.shape = (210, 160)
     self.actions = 4
     self.actions_meaning = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
+    self.obs_base = np.load('./asserts/base.npy')
+    self.digits = [np.load('./asserts/{}.npy'.format(i)) for i in range(10)]
+    self.render_bb = {
+      'scores': [[5, 15, 36, 48], [5, 15, 52, 64], [5, 15, 68, 80]],
+      'live': [5, 15, 100, 112],
+      'level': [5, 15, 128, 140]
+    }
   
   def step(self, action):
     if self.terminal:
@@ -84,13 +91,8 @@ class Breakout():
       self.ball.translate(self.ball_v)
       
       # Check collision
-      # Frame BB
       self.__edge_collision()
-
-      # Paddle BB
       self.__paddle_collision()
-
-      # Bricks BB
       self.reward = self.__bricks_collision()
       self.score += self.reward
 
@@ -119,6 +121,13 @@ class Breakout():
       obs[ball_bb[0]:ball_bb[1], ball_bb[2]:ball_bb[3]] = self.ball.color
 
     # Draw info (score, live)
+    live_bb = self.render_bb['live']
+    obs[live_bb[0]:live_bb[1], live_bb[2]:live_bb[3]] = self.digits[self.live]
+
+    scores_bb = self.render_bb['scores']
+    scores = [self.score // 10**i for i in range(2, -1, -1)]
+    for idx, bb in enumerate(scores_bb, 0):
+      obs[bb[0]:bb[1], bb[2]:bb[3]] = self.digits[scores[idx]]
 
     return obs
 
@@ -128,12 +137,11 @@ class Breakout():
     self.live = 5
     self.terminal = False
     self.started = False
-    self.obs_base = np.load('base.npy')
     self.ball = GameObject([100, 10], [5, 2])
-    self.ball_v = [-2, -2]
+    self.ball_v = [-5, -2]
     self.paddle = GameObject([189, 9], [4, 15])
     self.paddle_v = [0, 2]
-    self.bricks = Bricks(6, 8, [6, 8])
+    self.bricks = Bricks(6, 18, [6, 8])
     return self.render()
 
   def __edge_collision(self):
@@ -192,10 +200,10 @@ if __name__ == '__main__':
 
   # plt.ion()
   # plt.show()
-  for x in range(500):
+  for x in range(5000):
     obs, reward, done, _ = env.step(1)#random.randint(1, 3))
     print(x, reward, done)
     cv2.imshow('tt', obs)
-    cv2.waitKey(0)
+    cv2.waitKey(1)
     # plt.imshow(obs, cmap='gray')
     # plt.pause(0.01)
