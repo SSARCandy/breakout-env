@@ -1,6 +1,10 @@
 # Breakout-env
 
-A configurable Breakout environment.
+A [gym](https://github.com/openai/gym/blob/master/gym/envs/atari/atari_env.py) like Breakout environment but with more configurable options.
+
+![](./demo/normal.gif)
+![](./demo/big-ball.gif)
+![](./demo/big-paddle.gif)
 
 ## Configure Options
 
@@ -37,9 +41,11 @@ env = Breakout({
 for ep in range(2):
   obs = env.reset()
   for t in itertools.count():
+    # Select random action
     action = random.randint(0, env.actions - 1)
     obs, reward, done, _ = env.step(action)
     print('Episode: {}, Step: {}, Reward: {}, Done: {}'.format(ep, t, reward, done))
+    # Show the observation using OpenCV
     cv2.imshow('obs', obs)
     cv2.waitKey(1)
     if done:

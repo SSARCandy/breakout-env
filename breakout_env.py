@@ -71,7 +71,7 @@ class Bricks():
 
 
 class Breakout():
-  def __init__(self, config):
+  def __init__(self, config={}):
     self.conf = default_conf
     self.conf.update(config)
     self.step_count = 0
@@ -96,7 +96,7 @@ class Breakout():
 
     if act == 'RIGHT' and self.paddle.boundingbox()[3] + self.paddle_v[1] < FRAME_X[1]:
       self.paddle.translate(self.paddle_v)
-    if act == 'LEFT' and self.paddle.boundingbox()[3] - self.paddle_v[1] > FRAME_X[0]:
+    if act == 'LEFT' and self.paddle.boundingbox()[2] - self.paddle_v[1] > FRAME_X[0]:
       self.paddle.translate([-x for x in self.paddle_v])
 
     if self.started:
@@ -175,8 +175,8 @@ class Breakout():
     elif aabb(bb1, [FRAME_Y[1], 999, 0, 999]): # Bottom edge
       self.lifes -= 1
       self.terminal = self.started and self.lifes == 0
-      self.ball = GameObject([100, 10], [5, 2])
-      self.ball_v = [-2, -2]
+      self.ball = GameObject([100, 50], self.conf['ball_size'], self.conf['ball_color'])
+      self.ball_v = self.conf['ball_speed']
 
   def __paddle_collision(self):
     bb1 = self.ball.boundingbox()
