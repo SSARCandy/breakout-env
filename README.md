@@ -2,6 +2,10 @@
 
 A configurable breakout environment for reinforcement learning
 
+## Requirement
+
+- python3
+- numpy
 
 ## Reference
 
