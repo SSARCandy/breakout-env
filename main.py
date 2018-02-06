@@ -125,8 +125,8 @@ class Breakout():
     obs[live_bb[0]:live_bb[1], live_bb[2]:live_bb[3]] = self.digits[self.live]
 
     scores_bb = self.render_bb['scores']
-    scores = [self.score // 10**i for i in range(2, -1, -1)]
-    for idx, bb in enumerate(scores_bb, 0):
+    scores = [(self.score // 10**i) % 10 for i in range(2, -1, -1)]
+    for idx, bb in enumerate(scores_bb):
       obs[bb[0]:bb[1], bb[2]:bb[3]] = self.digits[scores[idx]]
 
     return obs
@@ -139,7 +139,7 @@ class Breakout():
     self.started = False
     self.ball = GameObject([100, 10], [5, 2])
     self.ball_v = [-5, -2]
-    self.paddle = GameObject([189, 9], [4, 15])
+    self.paddle = GameObject([189, 9], [4, 150])
     self.paddle_v = [0, 2]
     self.bricks = Bricks(6, 18, [6, 8])
     return self.render()
@@ -200,7 +200,7 @@ if __name__ == '__main__':
 
   # plt.ion()
   # plt.show()
-  for x in range(5000):
+  for x in range(50000):
     obs, reward, done, _ = env.step(1)#random.randint(1, 3))
     print(x, reward, done)
     cv2.imshow('tt', obs)
