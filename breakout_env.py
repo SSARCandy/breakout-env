@@ -4,14 +4,17 @@ FRAME_X = [7, 152]
 FRAME_Y = [31, 194]
 
 default_conf = {
-  'max_step': 1000,      # int        | 0 ~ inf
-  'lifes': 5,             # int        | 1 ~ inf
-  'ball_speed': [-5, 2], # [int, int] | -inf ~ inf
-  'ball_color': 143,     # int        | 0 ~ 255
+  'max_step': 10000,
+  'lifes': 5,
+  'ball_speed': [-5, 2],
+  'ball_color': 143,
   'ball_size': [5, 2],
   'paddle_width': 15,
   'paddle_color': 143,
-  'paddle_speed': 2
+  'paddle_speed': 2,
+  'bricks_rows': 6,
+  'bricks_color': [200, 180, 160, 140, 120, 100],
+  'bricks_reward': [6, 5, 4, 3, 2, 1]
 }
 
 # Collision detection
@@ -44,11 +47,14 @@ class GameObject():
 
 # A warpper of all bricks GameObject
 class Bricks():
-  def __init__(self, rows, cols, brick_size):
+  def __init__(self, rows, cols, brick_size, brick_colors, brick_rewards):
+    assert (len(brick_colors) == len(brick_rewards) == rows)
     self.bricks_pos = [57, 8]
     self.rows = rows
     self.cols = cols
     self.brick_size = brick_size
+    self.brick_colors = brick_colors
+    self.brick_rewards = brick_rewards
     self.bricks = []
 
     for r in range(self.rows):
@@ -158,7 +164,7 @@ class Breakout():
     self.ball_v = self.conf['ball_speed']
     self.paddle = GameObject([189, 9], [4, self.conf['paddle_width']], self.conf['paddle_color'])
     self.paddle_v = [0, self.conf['paddle_speed']]
-    self.bricks = Bricks(6, 18, [6, 8])
+    self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
     return self.render()
 
   def __edge_collision(self):
