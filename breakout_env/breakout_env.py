@@ -1,3 +1,4 @@
+import os
 import numpy as np
 
 FRAME_X = [7, 152]
@@ -7,7 +8,7 @@ default_conf = {
   'max_step': 10000,
   'lifes': 5,
   'ball_pos': [100, 40],
-  'ball_speed': [-4, 2],
+  'ball_speed': [4, 2],
   'ball_color': 143,
   'ball_size': [5, 2],
   'paddle_width': 15,
@@ -85,8 +86,8 @@ class Breakout():
     self.shape = (210, 160)
     self.actions = 4
     self.actions_meaning = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
-    self.obs_base = np.load('./asserts/base.npy')
-    self.digits = [np.load('./asserts/{}.npy'.format(i)) for i in range(10)]
+    self.obs_base = np.load(os.path.join(os.path.dirname(__file__), 'assets', 'base.npy'))
+    self.digits = [np.load(os.path.join(os.path.dirname(__file__), 'assets', '{}.npy'.format(i))) for i in range(10)]
     self.render_bb = {
       'scores': [[5, 15, 36, 48], [5, 15, 52, 64], [5, 15, 68, 80]],
       'lifes': [5, 15, 100, 112],
@@ -157,13 +158,14 @@ class Breakout():
   def reset(self):
     self.score = 0
     self.reward = 0
+    self.step_count = 0
     self.lifes = self.conf['lifes']
     self.max_step = self.conf['max_step']
     self.terminal = False
     self.started = False
     self.ball = GameObject(self.conf['ball_pos'], self.conf['ball_size'], self.conf['ball_color'])
     self.ball_v = list(self.conf['ball_speed'])
-    self.paddle = GameObject([189, 9], [4, self.conf['paddle_width']], self.conf['paddle_color'])
+    self.paddle = GameObject([189, 70], [4, self.conf['paddle_width']], self.conf['paddle_color'])
     self.paddle_v = [0, self.conf['paddle_speed']]
     self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
     return self.render()
@@ -183,7 +185,6 @@ class Breakout():
       self.lifes -= 1
       self.terminal = self.started and self.lifes == 0
       self.ball = GameObject(self.conf['ball_pos'], self.conf['ball_size'], self.conf['ball_color'])
-      print(self.conf['ball_pos'])
       self.ball_v = self.conf['ball_speed']
 
   def __paddle_collision(self):
