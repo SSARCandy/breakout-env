@@ -13,6 +13,7 @@ A [gym](https://github.com/openai/gym/blob/master/gym/envs/atari/atari_env.py) l
 |-----------------|---------------------------------|---------------|------------|----------------------------------|
 | `max_step`      | Max step per episode.           | `int`         | 0 ~ Inf    | `10000`                          |
 | `lifes`         | Lifes.                          | `int`         | 0 ~ 9      | `5`                              |
+| `ball_pos`      | Ball's initial position. [y, x] | `[int, int]`  | -Inf ~ Inf | `[150, 50]`                      |
 | `ball_speed`    | Ball's initial velocity. [y, x] | `[int, int]`  | -Inf ~ Inf | `[-5, 2]`                        |
 | `ball_color`    | Ball's color. (gray scale)      | `int`         | 0 ~ 255    | `143`                            |
 | `ball_size`     | Ball's size. [h, w]             | `[int, int]`  | 1 ~ Inf    | `[5, 2]`                         |
@@ -24,6 +25,20 @@ A [gym](https://github.com/openai/gym/blob/master/gym/envs/atari/atari_env.py) l
 | `bricks_reward` | The reward of bricks.\*         | list of `int` | -Inf ~ Inf | `[6, 5, 4, 3, 2, 1]`             |
 
 \* `len(bricks_color)` and `len(bricks_color)` should equal to `bricks_rows`.
+
+<!-- ## Installation
+
+Install from PyPI:
+
+```sh
+$ pip install <>
+```
+
+Install from master branch
+
+```sh
+$ pip install git+https://github.com/SSARCandy/breakout-env.git@master
+``` -->
 
 ## Example
 
@@ -51,7 +66,7 @@ for ep in range(2):
 
 ### Visualize the game
 
-The observation retuned by env is a numpy 2D array, it can be easily visualize using some libaray like [OpenCV]() or [matplotlib]().
+The observation retuned by env is a numpy 2D array, it can be easily visualize using some library like [OpenCV](https://opencv.org/) or [matplotlib](https://matplotlib.org/).
 
 ```py
 import cv2
@@ -71,7 +86,7 @@ while True:
     break
 ```
 
-## Requirement
+## Develop Requirement
 
 - python3
 - numpy

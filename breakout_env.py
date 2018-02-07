@@ -6,6 +6,7 @@ FRAME_Y = [31, 194]
 default_conf = {
   'max_step': 10000,
   'lifes': 5,
+  'ball_pos': [150, 50],
   'ball_speed': [-5, 2],
   'ball_color': 143,
   'ball_size': [5, 2],
@@ -27,8 +28,8 @@ def aabb(bb1, bb2):
 
 class GameObject():
   def __init__(self, pos, size, color=143, reward=0):
-    self.pos = pos
-    self.size = size
+    self.pos = list(pos)
+    self.size = list(size)
     self.color = color
     self.reward = reward
 
@@ -52,9 +53,9 @@ class Bricks():
     self.bricks_pos = [57, 8]
     self.rows = rows
     self.cols = cols
-    self.brick_size = brick_size
-    self.brick_colors = brick_colors
-    self.brick_rewards = brick_rewards
+    self.brick_size = list(brick_size)
+    self.brick_colors = list(brick_colors)
+    self.brick_rewards = list(brick_rewards)
     self.bricks = []
 
     for r in range(self.rows):
@@ -160,7 +161,7 @@ class Breakout():
     self.max_step = self.conf['max_step']
     self.terminal = False
     self.started = False
-    self.ball = GameObject([100, 50], self.conf['ball_size'], self.conf['ball_color'])
+    self.ball = GameObject(self.conf['ball_pos'], self.conf['ball_size'], self.conf['ball_color'])
     self.ball_v = self.conf['ball_speed']
     self.paddle = GameObject([189, 9], [4, self.conf['paddle_width']], self.conf['paddle_color'])
     self.paddle_v = [0, self.conf['paddle_speed']]
@@ -181,7 +182,8 @@ class Breakout():
     elif aabb(bb1, [FRAME_Y[1], 999, 0, 999]): # Bottom edge
       self.lifes -= 1
       self.terminal = self.started and self.lifes == 0
-      self.ball = GameObject([100, 50], self.conf['ball_size'], self.conf['ball_color'])
+      self.ball = GameObject(self.conf['ball_pos'], self.conf['ball_size'], self.conf['ball_color'])
+      print(self.conf['ball_pos'])
       self.ball_v = self.conf['ball_speed']
 
   def __paddle_collision(self):
@@ -192,7 +194,7 @@ class Breakout():
 
       # Re-new bricks if all clear
       if len(self.bricks.bricks) == 0:
-        self.bricks = Bricks(6, 18, [6, 8])
+        self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
 
   def __bricks_collision(self):
     bb1 = self.ball.boundingbox()
