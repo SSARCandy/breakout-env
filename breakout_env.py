@@ -6,13 +6,13 @@ FRAME_Y = [31, 194]
 default_conf = {
   'max_step': 10000,
   'lifes': 5,
-  'ball_pos': [150, 50],
-  'ball_speed': [-5, 2],
+  'ball_pos': [100, 40],
+  'ball_speed': [-4, 2],
   'ball_color': 143,
   'ball_size': [5, 2],
   'paddle_width': 15,
   'paddle_color': 143,
-  'paddle_speed': 2,
+  'paddle_speed': 3,
   'bricks_rows': 6,
   'bricks_color': [200, 180, 160, 140, 120, 100],
   'bricks_reward': [6, 5, 4, 3, 2, 1]
@@ -162,7 +162,7 @@ class Breakout():
     self.terminal = False
     self.started = False
     self.ball = GameObject(self.conf['ball_pos'], self.conf['ball_size'], self.conf['ball_color'])
-    self.ball_v = self.conf['ball_speed']
+    self.ball_v = list(self.conf['ball_speed'])
     self.paddle = GameObject([189, 9], [4, self.conf['paddle_width']], self.conf['paddle_color'])
     self.paddle_v = [0, self.conf['paddle_speed']]
     self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])

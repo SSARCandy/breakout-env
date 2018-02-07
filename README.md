@@ -13,13 +13,13 @@ A [gym](https://github.com/openai/gym/blob/master/gym/envs/atari/atari_env.py) l
 |-----------------|---------------------------------|---------------|------------|----------------------------------|
 | `max_step`      | Max step per episode.           | `int`         | 0 ~ Inf    | `10000`                          |
 | `lifes`         | Lifes.                          | `int`         | 0 ~ 9      | `5`                              |
-| `ball_pos`      | Ball's initial position. [y, x] | `[int, int]`  | -Inf ~ Inf | `[150, 50]`                      |
-| `ball_speed`    | Ball's initial velocity. [y, x] | `[int, int]`  | -Inf ~ Inf | `[-5, 2]`                        |
+| `ball_pos`      | Ball's initial position. [y, x] | `[int, int]`  | -Inf ~ Inf | `[100, 40]`                      |
+| `ball_speed`    | Ball's initial velocity. [y, x] | `[int, int]`  | -Inf ~ Inf | `[-4, 2]`                        |
 | `ball_color`    | Ball's color. (gray scale)      | `int`         | 0 ~ 255    | `143`                            |
 | `ball_size`     | Ball's size. [h, w]             | `[int, int]`  | 1 ~ Inf    | `[5, 2]`                         |
 | `paddle_width`  | Paddle's width.                 | `int`         | 1 ~ 100    | `15`                             |
 | `paddle_color`  | Paddle's color. (gray scale)    | `int`         | 0 ~ 255    | `143`                            |
-| `paddle_speed`  | Paddle's moving speed.          | `int`         | 1 ~ Inf    | `2`                              |
+| `paddle_speed`  | Paddle's moving speed.          | `int`         | 1 ~ Inf    | `3`                              |
 | `bricks_rows`   | Number of bricks row.           | `int`         | 0 ~ Inf    | `6`                              |
 | `bricks_color`  | Row color of bricks.\*          | list of `int` | 0 ~ 255    | `[200, 180, 160, 140, 120, 100]` |
 | `bricks_reward` | The reward of bricks.\*         | list of `int` | -Inf ~ Inf | `[6, 5, 4, 3, 2, 1]`             |
