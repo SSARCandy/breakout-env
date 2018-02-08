@@ -26,19 +26,19 @@ A [gym](https://github.com/openai/gym/blob/master/gym/envs/atari/atari_env.py) l
 
 \* `len(bricks_color)` and `len(bricks_color)` should equal to `bricks_rows`.
 
-<!-- ## Installation
+## Installation
 
 Install from PyPI:
 
 ```sh
-$ pip install <>
+$ pip install breakout_env
 ```
 
 Install from master branch
 
 ```sh
 $ pip install git+https://github.com/SSARCandy/breakout-env.git@master
-``` -->
+```
 
 ## Example
 
