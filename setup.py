@@ -18,4 +18,5 @@ setup(
   keywords = ['game', 'learning', 'evironment'], # arbitrary keywords
   classifiers = [],
   install_requires=['numpy>=1.1'],
+  include_package_data=True
 )
