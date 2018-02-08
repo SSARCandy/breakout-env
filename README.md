@@ -7,14 +7,14 @@ A [gym](https://github.com/openai/gym/blob/master/gym/envs/atari/atari_env.py) l
 ![](./demo/big-paddle.gif)
 ![](./demo/more-bricks.gif)
 
-## Configure Options
+## Configurable Options
 
 | Option          | Description                     | Type          | Range      | Default Value                    |
 |-----------------|---------------------------------|---------------|------------|----------------------------------|
 | `max_step`      | Max step per episode.           | `int`         | 0 ~ Inf    | `10000`                          |
-| `lifes`         | Lifes.                          | `int`         | 0 ~ 9      | `5`                              |
+| `lifes`         | Lifes per episode.              | `int`         | 0 ~ 9      | `5`                              |
 | `ball_pos`      | Ball's initial position. [y, x] | `[int, int]`  | -Inf ~ Inf | `[100, 40]`                      |
-| `ball_speed`    | Ball's initial velocity. [y, x] | `[int, int]`  | -Inf ~ Inf | `[-4, 2]`                        |
+| `ball_speed`    | Ball's initial velocity. [y, x] | `[int, int]`  | -Inf ~ Inf | `[4, 2]`                         |
 | `ball_color`    | Ball's color. (gray scale)      | `int`         | 0 ~ 255    | `143`                            |
 | `ball_size`     | Ball's size. [h, w]             | `[int, int]`  | 1 ~ Inf    | `[5, 2]`                         |
 | `paddle_width`  | Paddle's width.                 | `int`         | 1 ~ 100    | `15`                             |
@@ -42,11 +42,12 @@ $ pip install git+https://github.com/SSARCandy/breakout-env.git@master
 
 ## Example
 
-### Play with random action
+### Interact with environment
 
 ```py
 from breakout_env import Breakout
 
+# Create Breakout environment with some options.
 env = Breakout({
     'lifes': 7,
     'paddle_width': 30,
@@ -78,7 +79,7 @@ env.reset()
 while True:
   # Select random action
   action = random.randint(0, env.actions - 1)
-  obs, reward, done, _ = env.step(action)
+  obs, _, _, _ = env.step(action)
   # Show the observation using OpenCV
   cv2.imshow('obs', obs)
   cv2.waitKey(1)
