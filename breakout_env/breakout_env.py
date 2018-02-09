@@ -80,7 +80,7 @@ class Bricks():
 
 class Breakout():
   def __init__(self, config={}):
-    self.conf = default_conf
+    self.conf = default_conf.copy()
     self.conf.update(config)
     self.step_count = 0
     self.score = 0
@@ -170,6 +170,10 @@ class Breakout():
     self.paddle_v = [0, self.conf['paddle_speed']]
     self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
     return self.render()
+
+  @property
+  def action_space(self):
+    return self.actions
 
   def __edge_collision(self):
     bb1 = self.ball.boundingbox()
