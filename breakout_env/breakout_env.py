@@ -83,7 +83,6 @@ class Breakout():
     self.conf = default_conf.copy()
     self.conf.update(config)
     self.step_count = 0
-    self.score = 0
     self.shape = (210, 160)
     self.actions = 4
     self.actions_meaning = ['NOOP', 'FIRE', 'RIGHT', 'LEFT']
