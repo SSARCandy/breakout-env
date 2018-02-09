@@ -27,7 +27,7 @@ def aabb(bb1, bb2):
     return bb2[0] < bb1[1] and bb2[1] > bb1[0] and bb2[2] < bb1[3] and bb2[3] > bb1[2]
     
 
-class GameObject():
+class GameObject(object):
   def __init__(self, pos, size, color=143, reward=0):
     self.pos = list(pos)
     self.size = list(size)
@@ -38,17 +38,19 @@ class GameObject():
     self.pos[0] += translate[0]
     self.pos[1] += translate[1]
 
+  @property
   def boundingbox(self):
     # BB = (y1, y2, x1, x2)
     return [self.pos[0], self.pos[0] + self.size[0], self.pos[1], self.pos[1] + self.size[1]]
 
+  @property
   def center(self):
     x = self.pos[1] + self.size[1]/2.0
     y = self.pos[0] + self.size[0]/2.0
     return (y, x)
 
 # A warpper of all bricks GameObject
-class Bricks():
+class Bricks(object):
   def __init__(self, rows, cols, brick_size, brick_colors, brick_rewards):
     assert (len(brick_colors) == len(brick_rewards) == rows)
     self.bricks_pos = [57, 8]
@@ -69,6 +71,7 @@ class Bricks():
     rows = [GameObject([pos[0], pos[1] + p*self.brick_size[1]], self.brick_size, c, r) for p in range(self.cols)]
     return rows
 
+  @property
   def outer_boundingbox(self):
     return [
       self.bricks_pos[0], 
@@ -78,7 +81,7 @@ class Bricks():
     ]
 
 
-class Breakout():
+class Breakout(object):
   def __init__(self, config={}):
     self.conf = default_conf.copy()
     self.conf.update(config)
@@ -102,9 +105,9 @@ class Breakout():
 
     act = self.actions_meaning[action]
 
-    if act == 'RIGHT' and self.paddle.boundingbox()[3] + self.paddle_v[1] < FRAME_X[1]:
+    if act == 'RIGHT' and self.paddle.boundingbox[3] + self.paddle_v[1] < FRAME_X[1]:
       self.paddle.translate(self.paddle_v)
-    if act == 'LEFT' and self.paddle.boundingbox()[2] - self.paddle_v[1] > FRAME_X[0]:
+    if act == 'LEFT' and self.paddle.boundingbox[2] - self.paddle_v[1] > FRAME_X[0]:
       self.paddle.translate([-x for x in self.paddle_v])
 
     if self.started:
@@ -131,17 +134,17 @@ class Breakout():
     obs = np.copy(self.obs_base)
 
     # Draw paddle
-    paddle_bb = self.paddle.boundingbox()
+    paddle_bb = self.paddle.boundingbox
     obs[paddle_bb[0]:paddle_bb[1], paddle_bb[2]:paddle_bb[3]] = self.paddle.color
 
     # Draw bricks
     for brick in self.bricks.bricks:
-      bb = brick.boundingbox()
+      bb = brick.boundingbox
       obs[bb[0]:bb[1], bb[2]:bb[3]] = brick.color
 
     # Draw ball
     if self.started:
-      ball_bb = self.ball.boundingbox()
+      ball_bb = self.ball.boundingbox
       obs[ball_bb[0]:ball_bb[1], ball_bb[2]:ball_bb[3]] = self.ball.color
 
     # Draw info (score, lifes)
@@ -170,12 +173,8 @@ class Breakout():
     self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
     return self.render()
 
-  @property
-  def action_space(self):
-    return self.actions
-
   def __edge_collision(self):
-    bb1 = self.ball.boundingbox()
+    bb1 = self.ball.boundingbox
     if aabb(bb1, [0, 999, 0, FRAME_X[0]]): # Left edge
       self.ball_v = [self.ball_v[0], -self.ball_v[1]]
       self.ball.translate([0, 2*self.ball_v[1]])
@@ -192,8 +191,8 @@ class Breakout():
       self.ball_v = self.conf['ball_speed']
 
   def __paddle_collision(self):
-    bb1 = self.ball.boundingbox()
-    if aabb(bb1, self.paddle.boundingbox()):
+    bb1 = self.ball.boundingbox
+    if aabb(bb1, self.paddle.boundingbox):
       self.ball_v = [-self.ball_v[0], self.ball_v[1]]
       self.ball.translate([2*self.ball_v[0], 0])
 
@@ -202,8 +201,8 @@ class Breakout():
         self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
 
   def __bricks_collision(self):
-    bb1 = self.ball.boundingbox()
-    outer_bb = self.bricks.outer_boundingbox()
+    bb1 = self.ball.boundingbox
+    outer_bb = self.bricks.outer_boundingbox
 
     # Early return if not inside outer bounding box
     if not aabb(bb1, outer_bb):
@@ -215,7 +214,7 @@ class Breakout():
     # y1 = y2 - self.ball_v[0]
 
     for idx, brick in enumerate(self.bricks.bricks):
-      bb2 = brick.boundingbox()
+      bb2 = brick.boundingbox
 
       if not aabb(bb1, bb2):
         continue
