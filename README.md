@@ -2,10 +2,10 @@
 
 A [gym](https://github.com/openai/gym/blob/master/gym/envs/atari/atari_env.py) like Breakout environment but with more configurable options.
 
-![](./demo/normal.gif)
-![](./demo/big-ball.gif)
-![](./demo/big-paddle.gif)
-![](./demo/more-bricks.gif)
+![](https://raw.githubusercontent.com/SSARCandy/breakout-env/master/demo/normal.gif)
+![](https://raw.githubusercontent.com/SSARCandy/breakout-env/master/demo/big-ball.gif)
+![](https://raw.githubusercontent.com/SSARCandy/breakout-env/master/demo/big-paddle.gif)
+![](https://raw.githubusercontent.com/SSARCandy/breakout-env/master/demo/more-bricks.gif)
 
 ## Configurable Options
 
