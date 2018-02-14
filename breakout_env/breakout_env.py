@@ -168,6 +168,7 @@ class Breakout(object):
     self.started = False
     self.ball = GameObject(self.conf['ball_pos'], self.conf['ball_size'], self.conf['ball_color'])
     self.ball_v = list(self.conf['ball_speed'])
+    self.ball_hit = False
     self.paddle = GameObject([189, 70], [4, self.conf['paddle_width']], self.conf['paddle_color'])
     self.paddle_v = [0, self.conf['paddle_speed']]
     self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
@@ -178,23 +179,28 @@ class Breakout(object):
     if aabb(bb1, [0, 999, 0, FRAME_X[0]]): # Left edge
       self.ball_v = [self.ball_v[0], -self.ball_v[1]]
       self.ball.translate([0, 2*self.ball_v[1]])
+      self.ball_hit = False
     elif aabb(bb1, [0, 999, FRAME_X[1], 999]): # Right edge
       self.ball_v = [self.ball_v[0], -self.ball_v[1]]
       self.ball.translate([0, 2*self.ball_v[1]])
+      self.ball_hit = False
     elif aabb(bb1, [0, FRAME_Y[0], 0, 999]): # Top edge
       self.ball_v = [-self.ball_v[0], self.ball_v[1]]
       self.ball.translate([2*self.ball_v[0], 0])
+      self.ball_hit = False
     elif aabb(bb1, [FRAME_Y[1], 999, 0, 999]): # Bottom edge
       self.lifes -= 1
       self.terminal = self.started and self.lifes == 0
       self.ball = GameObject(self.conf['ball_pos'], self.conf['ball_size'], self.conf['ball_color'])
       self.ball_v = self.conf['ball_speed']
+      self.ball_hit = False
 
   def __paddle_collision(self):
     bb1 = self.ball.boundingbox
     if aabb(bb1, self.paddle.boundingbox):
       self.ball_v = [-self.ball_v[0], self.ball_v[1]]
       self.ball.translate([2*self.ball_v[0], 0])
+      self.ball_hit = False
 
       # Re-new bricks if all clear
       if len(self.bricks.bricks) == 0:
@@ -204,31 +210,22 @@ class Breakout(object):
     bb1 = self.ball.boundingbox
     outer_bb = self.bricks.outer_boundingbox
 
-    # Early return if not inside outer bounding box
-    if not aabb(bb1, outer_bb):
+    # Early return if not inside outer bounding box or
+    # Ball had hit in current session (crrent reflection)
+    if not aabb(bb1, outer_bb) or self.ball_hit:
       return 0
-
-    x2 = (bb1[2] + bb1[3]) / 2.0
-    # y2 = (bb1[0] + bb1[1]) / 2.0
-    x1 = x2 - self.ball_v[1]
-    # y1 = y2 - self.ball_v[0]
 
     for idx, brick in enumerate(self.bricks.bricks):
       bb2 = brick.boundingbox
 
-      if not aabb(bb1, bb2):
-        continue
-
-      if (x1 < bb2[2] and x2 > bb2[2]) or (x1 > bb2[3] and x2 < bb2[3]):
-        self.ball_v = [self.ball_v[0], -self.ball_v[1]]
-        self.ball.translate([0, 2*self.ball_v[1]])
-      else:
+      if aabb(bb1, bb2):
+        self.ball_hit = True
         self.ball_v = [-self.ball_v[0], self.ball_v[1]]
         self.ball.translate([2*self.ball_v[0], 0])
 
-      r = brick.reward
-      del self.bricks.bricks[idx]
-      return r
+        r = brick.reward
+        del self.bricks.bricks[idx]
+        return r
 
     return 0
 
