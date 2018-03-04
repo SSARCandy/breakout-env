@@ -16,7 +16,8 @@ default_conf = {
   'paddle_speed': 3,
   'bricks_rows': 6,
   'bricks_color': [200, 180, 160, 140, 120, 100],
-  'bricks_reward': [6, 5, 4, 3, 2, 1]
+  'bricks_reward': [6, 5, 4, 3, 2, 1],
+  'catch_reward': 0
 }
 
 # Collision detection
@@ -115,8 +116,8 @@ class Breakout(object):
       
       # Check collision
       self.__edge_collision()
-      self.__paddle_collision()
-      self.reward = self.__bricks_collision()
+      self.reward = self.__paddle_collision()
+      self.reward += self.__bricks_collision()
       self.score += self.reward
 
     # Check is FIRE
@@ -168,7 +169,7 @@ class Breakout(object):
     self.started = False
     self.ball = GameObject(self.conf['ball_pos'], self.conf['ball_size'], self.conf['ball_color'])
     self.ball_v = list(self.conf['ball_speed'])
-    self.paddle = GameObject([189, 70], [4, self.conf['paddle_width']], self.conf['paddle_color'])
+    self.paddle = GameObject([189, 70], [4, self.conf['paddle_width']], self.conf['paddle_color'], self.conf['catch_reward'])
     self.paddle_v = [0, self.conf['paddle_speed']]
     self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
     return self.render()
@@ -199,6 +200,9 @@ class Breakout(object):
       # Re-new bricks if all clear
       if len(self.bricks.bricks) == 0:
         self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
+
+      return self.paddle.reward
+    return 0
 
   def __bricks_collision(self):
     bb1 = self.ball.boundingbox
