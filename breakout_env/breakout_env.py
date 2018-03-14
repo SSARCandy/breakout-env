@@ -19,7 +19,8 @@ default_conf = {
   'bricks_reward': [6, 5, 4, 3, 2, 1],
   'catch_reward': 0,
   'bricks_hardness': 1,
-  'dynamic_paddle_width': None
+  'dynamic_paddle_width': None,
+  'preset': None
 }
 
 # Collision detection
@@ -123,7 +124,10 @@ class Breakout(object):
       # Check collision
       self.__edge_collision()
       self.reward = self.__paddle_collision()
-      self.reward += self.__bricks_collision()
+      self.reward += self.__bricks_collision() 
+      if self.conf['preset'] == 'moving_bricks':
+        self.reward += self.__moving_bricks_collision() 
+        
       self.score += self.reward
 
       # Change paddle width if need
@@ -154,6 +158,11 @@ class Breakout(object):
       bb = brick.boundingbox
       obs[bb[0]:bb[1], bb[2]:bb[3]] = brick.color
 
+    if self.conf['preset'] == 'moving_bricks':
+      for brick in self.moving_bricks:
+        bb = brick.boundingbox
+        obs[bb[0]:bb[1], bb[2]:bb[3]] = brick.color
+  
     # Draw ball
     if self.started:
       ball_bb = self.ball.boundingbox
@@ -183,6 +192,15 @@ class Breakout(object):
     self.paddle = GameObject([189, 70], [4, self.conf['paddle_width']], self.conf['paddle_color'], self.conf['catch_reward'])
     self.paddle_v = [0, self.conf['paddle_speed']]
     self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'], self.conf['bricks_hardness'])
+
+    if self.conf['preset'] == 'moving_bricks':
+      self.moving_bricks = [
+        GameObject([110, 50], [6, 10], 120, 1),
+        GameObject([130, 70], [6, 10], 120, 1)
+      ]
+      for b in self.moving_bricks:
+        b.v = 2
+
     return self.render()
 
   def __edge_collision(self):
@@ -211,6 +229,13 @@ class Breakout(object):
       # Re-new bricks if all clear
       if len(self.bricks.bricks) == 0:
         self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'], self.conf['bricks_hardness'])
+        if self.conf['preset'] == 'moving_bricks':
+          self.moving_bricks = [
+            GameObject([110, 50], [6, 10], 120, 1),
+            GameObject([130, 70], [6, 10], 120, 1)
+          ]
+          for b in self.moving_bricks:
+            b.v = 2
 
       return self.paddle.reward
     return 0
@@ -249,3 +274,28 @@ class Breakout(object):
 
     return 0
 
+  def __moving_bricks_collision(self):
+    bb1 = self.ball.boundingbox
+    x2 = (bb1[2] + bb1[3]) / 2.0
+    x1 = x2 - self.ball_v[1]
+    for idx, brick in enumerate(self.moving_bricks):
+      bb2 = brick.boundingbox
+
+      if not aabb(bb1, bb2):
+        if bb2[3] + 1 >= FRAME_X[1] or bb2[2] - 1 <= FRAME_X[0]:
+          brick.v = -brick.v
+        brick.translate([0, brick.v])
+        continue
+
+      if (x1 < bb2[2] and x2 > bb2[2]) or (x1 > bb2[3] and x2 < bb2[3]):
+        self.ball_v = [self.ball_v[0], -self.ball_v[1]]
+        self.ball.translate([0, 2*self.ball_v[1]])
+      else:
+        self.ball_v = [-self.ball_v[0], self.ball_v[1]]
+        self.ball.translate([2*self.ball_v[0], 0])
+
+      r = brick.reward
+      del self.moving_bricks[idx]
+      return r
+
+    return 0
