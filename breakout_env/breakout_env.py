@@ -17,7 +17,8 @@ default_conf = {
   'bricks_rows': 6,
   'bricks_color': [200, 180, 160, 140, 120, 100],
   'bricks_reward': [6, 5, 4, 3, 2, 1],
-  'catch_reward': 0
+  'catch_reward': 0,
+  'bricks_hardness': 1
 }
 
 # Collision detection
@@ -52,7 +53,7 @@ class GameObject(object):
 
 # A warpper of all bricks GameObject
 class Bricks(object):
-  def __init__(self, rows, cols, brick_size, brick_colors, brick_rewards):
+  def __init__(self, rows, cols, brick_size, brick_colors, brick_rewards, bricks_hardness):
     assert (len(brick_colors) == len(brick_rewards) == rows)
     self.bricks_pos = [57, 8]
     self.rows = rows
@@ -61,6 +62,7 @@ class Bricks(object):
     self.brick_colors = list(brick_colors)
     self.brick_rewards = list(brick_rewards)
     self.bricks = []
+    self.bricks_hardness = bricks_hardness
 
     for r in range(self.rows):
       y = self.bricks_pos[0] + r*self.brick_size[0]
@@ -70,6 +72,9 @@ class Bricks(object):
       
   def __create_rows(self, pos, c, r):
     rows = [GameObject([pos[0], pos[1] + p*self.brick_size[1]], self.brick_size, c, r) for p in range(self.cols)]
+    for b in rows:
+      b.hardness = self.bricks_hardness
+
     return rows
 
   @property
@@ -171,7 +176,7 @@ class Breakout(object):
     self.ball_v = list(self.conf['ball_speed'])
     self.paddle = GameObject([189, 70], [4, self.conf['paddle_width']], self.conf['paddle_color'], self.conf['catch_reward'])
     self.paddle_v = [0, self.conf['paddle_speed']]
-    self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
+    self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'], self.conf['bricks_hardness'])
     return self.render()
 
   def __edge_collision(self):
@@ -199,7 +204,7 @@ class Breakout(object):
 
       # Re-new bricks if all clear
       if len(self.bricks.bricks) == 0:
-        self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'])
+        self.bricks = Bricks(self.conf['bricks_rows'], 18, [6, 8], self.conf['bricks_color'], self.conf['bricks_reward'], self.conf['bricks_hardness'])
 
       return self.paddle.reward
     return 0
@@ -231,7 +236,9 @@ class Breakout(object):
         self.ball.translate([2*self.ball_v[0], 0])
 
       r = brick.reward
-      del self.bricks.bricks[idx]
+      brick.hardness -= 1
+      if brick.hardness == 0:
+        del self.bricks.bricks[idx]
       return r
 
     return 0
