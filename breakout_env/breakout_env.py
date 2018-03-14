@@ -18,7 +18,8 @@ default_conf = {
   'bricks_color': [200, 180, 160, 140, 120, 100],
   'bricks_reward': [6, 5, 4, 3, 2, 1],
   'catch_reward': 0,
-  'bricks_hardness': 1
+  'bricks_hardness': 1,
+  'dynamic_paddle_width': None
 }
 
 # Collision detection
@@ -124,6 +125,11 @@ class Breakout(object):
       self.reward = self.__paddle_collision()
       self.reward += self.__bricks_collision()
       self.score += self.reward
+
+      # Change paddle width if need
+      if self.conf['dynamic_paddle_width'] is not None:
+        func = self.conf['dynamic_paddle_width']
+        self.paddle.size[1] = func(self.conf['paddle_width'], self.score)
 
     # Check is FIRE
     if self.actions_meaning[action] == 'FIRE':
