@@ -126,7 +126,14 @@ class Breakout(object):
       self.reward = self.__paddle_collision()
       self.reward += self.__bricks_collision() 
       if self.conf['preset'] == 'moving_bricks':
-        self.reward += self.__moving_bricks_collision() 
+        self.reward += self.__moving_bricks_collision()
+      if self.conf['preset'] == 'falling_bricks':
+        if self.step_count % 200 == 0:
+          self.bricks.bricks_pos[0] += 6
+          for b in self.bricks.bricks:
+            b.pos[0] += 6
+            if b.pos[0] >= FRAME_Y[1]:
+              self.terminal = True
         
       self.score += self.reward
 
@@ -200,7 +207,7 @@ class Breakout(object):
       ]
       for b in self.moving_bricks:
         b.v = 2
-
+    
     return self.render()
 
   def __edge_collision(self):
