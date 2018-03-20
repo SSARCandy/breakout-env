@@ -128,11 +128,11 @@ class Breakout(object):
       if self.conf['preset'] == 'moving_bricks':
         self.reward += self.__moving_bricks_collision()
       if self.conf['preset'] == 'falling_bricks':
-        if self.step_count % 200 == 0:
+        if self.step_count % 1000 == 0:
           self.bricks.bricks_pos[0] += 6
           for b in self.bricks.bricks:
             b.pos[0] += 6
-            if b.pos[0] >= FRAME_Y[1]:
+            if b.pos[0] + b.size[0] >= FRAME_Y[1]:
               self.terminal = True
         
       self.score += self.reward
